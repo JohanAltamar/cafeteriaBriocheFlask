@@ -1,0 +1,79 @@
+.toggleVisibilityFlex {
+  display: flex;
+}
+
+@keyframes opacity {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes opacity-out {
+  0% {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+.background-in {
+  animation-name: opacity;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
+}
+
+.background-out {
+  animation-name: opacity-out;
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+@keyframes fadeOutLeft {
+  0% {
+    opacity: 1;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.fadeInLeft {
+  animation-name: fadeInLeft;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
+}
+
+.fadeOutLeft {
+  animation-name: fadeOutLeft;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease;
+}
+
+.toggleVisibilityBlock {
+  display: block;
+}

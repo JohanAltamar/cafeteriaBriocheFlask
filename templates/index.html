@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/main.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cafetería Brioche</title>
+  </head>
+  <body>
+    <main>
+      <section class="col-5">
+        <div class="user-icon">
+          <a href="cashier-panel.html">
+            <i class="fa fa-user" aria-hidden="true"></i>
+            <h2>Ingresar</h2>
+          </a>
+        </div>
+        <form action="/" method="POST">
+          <div>
+            <label for="username">Usuario</label>
+            <input id="username" type="text" placeholder="Nombre de usuario" />
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Contraseña" />
+          </div>
+          <div>
+            <a href="/reset-password.html">¿Olvidó su contraseña?</a>
+          </div>
+          <button type="submit">Ingresar</button>
+        </form>
+        <div id="logo-container">
+          <img
+            id="misiontic-logo"
+            src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
+            alt="MisionTIC 2022 logo"
+          />
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

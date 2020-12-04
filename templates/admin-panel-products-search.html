@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/styles/admin-dashboard.css" />
+    <link rel="stylesheet" href="/src/styles/animations.css" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Admin Panel | Cafetería Brioche</title>
+  </head>
+  <body>
+    <header>
+      <h1>Cafetería Brioche <span>- Administrador</span></h1>
+      <a href="/index.html">
+        <img src="src/images/misiontic_logo.png" alt="Mision TIC logo" />
+      </a>
+      <div class="menu-button">
+        <i class="fa fa-bars"></i>
+      </div>
+    </header>
+    <main>
+      <h1 class="title">Buscar Producto</h1>
+      <form action="" class="search-box">
+        <input
+          type="text"
+          id="username"
+          placeholder="Ingrese nombre del producto"
+        />
+        <button><i class="fa fa-search"></i></button>
+      </form>
+      <section class="products-gallery">
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/coffee-cup.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/juice.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/coffee-cup.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/juice.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/coffee-cup.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="product-card">
+          <img
+            class="product-card-image"
+            src="src/images/juice.jpg"
+            alt="Taza de café"
+          />
+          <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+      </section>
+    </main>
+    <!-- set drawer display property to 'flex' -->
+    <div class="drawer">
+      <div class="drawer-container">
+        <div class="drawer-header">
+          <a href="admin-dashboard.html">
+            <img src="src/images/misiontic_logo_color.png" />
+          </a>
+          <h4>Cafetería Brioche</h4>
+          <h6>Administrador</h6>
+        </div>
+        <div class="drawer-list">
+          <div class="drawer-list-item">
+            <i class="fa fa-users"></i>
+            Usuarios
+            <i class="fa fa-chevron-down"></i>
+            <i class="fa fa-chevron-up"></i>
+          </div>
+          <div class="drawer-list-item-subitems" id="users">
+            <a href="admin-panel-users-add.html">
+              <div class="drawer-list-subitem">
+                <i class="fa fa-plus"></i>
+                Agregar Usuario
+              </div>
+            </a>
+            <a href="admin-panel-users-edit.html">
+              <div class="drawer-list-subitem">
+                <i class="fa fa-pencil"></i>
+                Modificar Usuario
+              </div>
+            </a>
+          </div>
+          <div class="drawer-list-item">
+            <i class="fa fa-cutlery"></i>
+            Productos
+            <i class="fa fa-chevron-down"></i>
+            <i class="fa fa-chevron-up"></i>
+          </div>
+          <div class="drawer-list-item-subitems" id="products">
+            <a href="admin-panel-products-add.html">
+              <div class="drawer-list-subitem">
+                <i class="fa fa-plus"></i>
+                Agregar Producto
+              </div>
+            </a>
+            <a href="admin-panel-products-edit.html">
+              <div class="drawer-list-subitem">
+                <i class="fa fa-pencil"></i>
+                Modificar Producto
+              </div>
+            </a>
+          </div>
+          <a href="admin-panel-reports.html">
+            <div class="drawer-list-item">
+              <i class="fa fa-list"></i>
+              Reportes
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="drawer-background"></div>
+    </div>
+    <script src="src/scripts/main.js"></script>
+  </body>
+</html>
