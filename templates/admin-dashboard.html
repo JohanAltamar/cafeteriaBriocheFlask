@@ -28,7 +28,10 @@
     <header>
       <h1>Cafetería Brioche <span>- Administrador</span></h1>
       <a href="/index.html">
-        <img src="src/images/misiontic_logo.png" alt="Mision TIC logo" />
+        <img
+          src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
+          alt="Mision TIC logo"
+        />
       </a>
       <div class="menu-button">
         <i class="fa fa-bars"></i>
