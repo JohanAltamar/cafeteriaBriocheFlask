@@ -37,6 +37,11 @@ def admin_subpaths(subpath):
 def cashier():
     return render_template("cashier-panel.html")
 
+@app.route("/reset")
+def reset():
+    return render_template('reset-password.html')
+
 def do_the_login():
     print("Haciendo login")
     return redirect(url_for('admin'))
+

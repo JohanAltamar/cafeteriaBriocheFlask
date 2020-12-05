@@ -3,8 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/src/styles/admin-dashboard.css" />
-    <link rel="stylesheet" href="/src/styles/animations.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/admin-dashboard.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/animations.css') }}"
+    />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -21,8 +27,11 @@
   <body>
     <header>
       <h1>Cafetería Brioche <span>- Administrador</span></h1>
-      <a href="/index.html">
-        <img src="src/images/misiontic_logo.png" alt="Mision TIC logo" />
+      <a href="/">
+        <img
+          src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
+          alt="Mision TIC logo"
+        />
       </a>
       <div class="menu-button">
         <i class="fa fa-bars"></i>
@@ -63,8 +72,10 @@
     <div class="drawer">
       <div class="drawer-container">
         <div class="drawer-header">
-          <a href="admin-dashboard.html">
-            <img src="src/images/misiontic_logo_color.png" />
+          <a href="/">
+            <img
+              src="{{ url_for('static', filename='images/misiontic_logo_color.png') }}"
+            />
           </a>
           <h4>Cafetería Brioche</h4>
           <h6>Administrador</h6>
@@ -77,13 +88,13 @@
             <i class="fa fa-chevron-up"></i>
           </div>
           <div class="drawer-list-item-subitems" id="users">
-            <a href="admin-panel-users-add.html">
+            <a href="/admin/users/add">
               <div class="drawer-list-subitem">
                 <i class="fa fa-plus"></i>
                 Agregar Usuario
               </div>
             </a>
-            <a href="admin-panel-users-edit.html">
+            <a href="/admin/users/edit">
               <div class="drawer-list-subitem">
                 <i class="fa fa-pencil"></i>
                 Modificar Usuario
@@ -97,20 +108,20 @@
             <i class="fa fa-chevron-up"></i>
           </div>
           <div class="drawer-list-item-subitems" id="products">
-            <a href="admin-panel-products-add.html">
+            <a href="/admin/products/add">
               <div class="drawer-list-subitem">
                 <i class="fa fa-plus"></i>
                 Agregar Producto
               </div>
             </a>
-            <a href="admin-panel-products-edit.html">
+            <a href="/admin/products/edit">
               <div class="drawer-list-subitem">
                 <i class="fa fa-pencil"></i>
                 Modificar Producto
               </div>
             </a>
           </div>
-          <a href="admin-panel-reports.html">
+          <a href="/admin/reports">
             <div class="drawer-list-item">
               <i class="fa fa-list"></i>
               Reportes
@@ -120,6 +131,6 @@
       </div>
       <div class="drawer-background"></div>
     </div>
-    <script src="src/scripts/main.js"></script>
+    <script src="{{url_for('static', filename='scripts/main.js')}}"></script>
   </body>
 </html>
