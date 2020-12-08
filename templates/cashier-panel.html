@@ -1,144 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles/cashier-panel.css') }}"
+{% extends 'cashier-layout.html' %} {% block body %}
+<main>
+  <form action="" class="search-box">
+    <input
+      type="text"
+      id="username"
+      placeholder="Ingrese nombre del producto"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles/animations.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-      crossorigin="anonymous"
-    />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-      rel="stylesheet"
-    />
-    <title>Cashier Panel | Cafetería Brioche</title>
-  </head>
-  <body>
-    <header>
-      <h1>Cafetería Brioche <span>- Cajero</span></h1>
-      <a href="/">
+    <button><i class="fa fa-search"></i></button>
+  </form>
+  <section class="main-container">
+    <section class="products-gallery">
+      <div class="product-card">
         <img
-          src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
-          alt="Mision TIC logo"
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
+          alt="Taza de café"
         />
-      </a>
-      <!-- <div class="menu-button">
-        <i class="fa fa-bars"></i>
-      </div> -->
-    </header>
-    <main>
-      <form action="" class="search-box">
-        <input
-          type="text"
-          id="username"
-          placeholder="Ingrese nombre del producto"
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+      <div class="product-card">
+        <img
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/juice.jpg') }}"
+          alt="Jugo"
         />
-        <button><i class="fa fa-search"></i></button>
-      </form>
-      <section class="main-container">
-        <section class="products-gallery">
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-              alt="Taza de café"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+      <div class="product-card">
+        <img
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
+          alt="Taza de café"
+        />
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+      <div class="product-card">
+        <img
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/juice.jpg') }}"
+          alt="Jugo"
+        />
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+      <div class="product-card">
+        <img
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
+          alt="Taza de café"
+        />
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+      <div class="product-card">
+        <img
+          class="product-card-image"
+          src="{{ url_for('static', filename='images/juice.jpg') }}"
+          alt="Jugo"
+        />
+        <h2 class="product-card-price">$ 5.000</h2>
+      </div>
+    </section>
+    <section class="cart-resume">
+      <h3 class="title">Resumen de la Orden</h3>
+      <div class="cart-items-container">
+        <div class="cart-item">
+          <div class="cart-item-resume">
+            <h4>Taza de Café</h4>
+            <h4>$ 8.000</h4>
           </div>
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/juice.jpg') }}"
-              alt="Jugo"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+          <div class="cart-item-details">
+            <span>x2</span>
+            <span>$ 4.000</span>
           </div>
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-              alt="Taza de café"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-resume">
+            <h4>Jugo de Fresa</h4>
+            <h4>$ 8.000</h4>
           </div>
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/juice.jpg') }}"
-              alt="Jugo"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+          <div class="cart-item-details">
+            <span>x2</span>
+            <span>$ 4.000</span>
           </div>
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-              alt="Taza de café"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-resume">
+            <h4>Malteada</h4>
+            <h4>$ 8.000</h4>
           </div>
-          <div class="product-card">
-            <img
-              class="product-card-image"
-              src="{{ url_for('static', filename='images/juice.jpg') }}"
-              alt="Jugo"
-            />
-            <h2 class="product-card-price">$ 5.000</h2>
+          <div class="cart-item-details">
+            <span>x2</span>
+            <span>$ 4.000</span>
           </div>
-        </section>
-        <section class="cart-resume">
-          <h3 class="title">Resumen de la Orden</h3>
-          <div class="cart-items-container">
-            <div class="cart-item">
-              <div class="cart-item-resume">
-                <h4>Taza de Café</h4>
-                <h4>$ 8.000</h4>
-              </div>
-              <div class="cart-item-details">
-                <span>x2</span>
-                <span>$ 4.000</span>
-              </div>
-            </div>
-            <div class="cart-item">
-              <div class="cart-item-resume">
-                <h4>Jugo de Fresa</h4>
-                <h4>$ 8.000</h4>
-              </div>
-              <div class="cart-item-details">
-                <span>x2</span>
-                <span>$ 4.000</span>
-              </div>
-            </div>
-            <div class="cart-item">
-              <div class="cart-item-resume">
-                <h4>Malteada</h4>
-                <h4>$ 8.000</h4>
-              </div>
-              <div class="cart-item-details">
-                <span>x2</span>
-                <span>$ 4.000</span>
-              </div>
-            </div>
-          </div>
-          <div class="cart-total-container">
-            <h3>Total</h3>
-            <h3>$ 8.000</h3>
-          </div>
-          <button>Finalizar Venta</button>
-        </section>
-      </section>
-    </main>
-    <!-- set drawer display property to 'flex' -->
-  </body>
-</html>
+        </div>
+      </div>
+      <div class="cart-total-container">
+        <h3>Total</h3>
+        <h3>$ 8.000</h3>
+      </div>
+      <button>Finalizar Venta</button>
+    </section>
+  </section>
+</main>
+{% endblock body %}
