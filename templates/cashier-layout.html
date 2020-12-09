@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/cashier-panel.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/animations.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Cashier Panel | Cafetería Brioche</title>
+  </head>
+  <header>
+    <h1>Cafetería Brioche <span>- Cajero</span></h1>
+    <a href="/">
+      <img
+        src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
+        alt="Mision TIC logo"
+      />
+    </a>
+    <!-- <div class="menu-button">
+        <i class="fa fa-bars"></i>
+      </div> -->
+  </header>
+  {% block body %} {% endblock body %}
+</html>
