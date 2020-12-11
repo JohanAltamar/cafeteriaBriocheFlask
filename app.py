@@ -27,7 +27,7 @@ def reset_password():
                 print("Email sent to: " + email)
                 yag.send(to=email,subject='Recupera tu contraseña',
                 contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: usuario_aqui\n -Correo: ' + email + '\n -Contraseña: tu_password')  
-                return 'revisa tu correo='+email
+                return render_template('reset-password.html', RESET_OK="true")
             #             else:
             #                 return 'Error Clave no cumple con lo exigido'    
             #     else:
@@ -36,7 +36,7 @@ def reset_password():
                 return 'Error Correo no cumple con lo exigido'                      
         else:
             print("================ GET request ===============")
-            return render_template('reset-password.html')
+            return render_template('reset-password.html', RESET_OK="false")
             # return 'Error faltan datos para validar'
     except:
         return "render_template('reset-password.html')"
