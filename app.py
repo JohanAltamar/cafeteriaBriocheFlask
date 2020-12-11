@@ -1,14 +1,45 @@
 from flask import Flask, render_template, request,redirect, url_for
 from markupsafe import escape
+import yagmail
+import utils
 
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
-def login():
+def index():
     if request.method == "GET":
         return render_template('index.html')
     else:
         return do_the_login()
+
+@app.route("/reset", methods=["GET", "POST"])
+def reset_password():
+    try:
+        if request.method == 'POST':
+            print("============= POST REQUEST ============")
+            # usuario=request.form['usuario'] #sacar los campos del form
+            # clave=request.form['clave']
+            email=request.form['email']
+            if utils.isEmailValid(email):
+                # if utils.isUsernameValid(usuario):
+                        # if utils.isPasswordValid(clave):
+                yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
+                print("Email sent to: " + email)
+                yag.send(to=email,subject='Recupera tu contraseña',
+                contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: usuario_aqui\n -Correo: ' + email + '\n -Contraseña: tu_password')  
+                return 'revisa tu correo='+email
+            #             else:
+            #                 return 'Error Clave no cumple con lo exigido'    
+            #     else:
+            #         return 'Error usuario no cumple con lo exigido'
+            else:
+                return 'Error Correo no cumple con lo exigido'                      
+        else:
+            print("================ GET request ===============")
+            return render_template('reset-password.html')
+            # return 'Error faltan datos para validar'
+    except:
+        return "render_template('reset-password.html')"
 
 @app.route("/admin")
 def admin():
@@ -37,13 +68,36 @@ def admin_subpaths(subpath):
 def cashier():
     return render_template("cashier-panel.html")
 
-@app.route("/reset")
-def reset():
-    return render_template('reset-password.html')
-
 def do_the_login():
     print("Haciendo login")
     return redirect(url_for('admin'))
+
+@app.route("/add_new_user", methods=["POST"])
+def add_new_user_mail_sender():
+    try:
+        if request.method == 'POST':
+            usuario=request.form['username'] #sacar los campos del form
+            clave=request.form['password']
+            email=request.form['email']
+            if utils.isEmailValid(email):
+                if utils.isUsernameValid(usuario):
+                        if utils.isPasswordValid(clave):
+                            yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
+                            print("Email sent to: " + email)
+                            yag.send(to=email,subject='Cuenta Creada',
+                            contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: ' + usuario + '\n -Correo: ' + email + '\n -Contraseña:' + clave)  
+                            return 'revisa tu correo='+email
+                        else:
+                            return 'Error Clave no cumple con lo exigido'    
+                else:
+                    return 'Error usuario no cumple con lo exigido'
+            else:
+                return 'Error Correo no cumple con lo exigido'                      
+        else:
+            # return render_template('reset-password.html')
+            return 'Error faltan datos para validar'
+    except:
+        return "Ocurrió un error"
 
 @app.after_request
 def after_request(response):
