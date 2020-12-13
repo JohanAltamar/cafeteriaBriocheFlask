@@ -1,7 +1,7 @@
 {% extends 'admin-layout.html' %} {% block body %}
 <main>
   <h1 class="title">Agregar Usuario</h1>
-  <form action="/add_new_user" method="POST">
+  <form action="/admin/users/add" method="POST">
     <div>
       <label for="username">Usuario</label>
       <input
@@ -23,7 +23,7 @@
     <div>
       <label for="password">Contraseña</label>
       <input
-        type="text"
+        type="password"
         id="password"
         name="password"
         placeholder="Ingrese contraseña"
@@ -31,5 +31,9 @@
     </div>
     <button type="submit">Crear Usuario</button>
   </form>
+  {% if Alert != "" %}
+  <br />
+  <h2>{{Alert}}</h2>
+  {% endif %}
 </main>
 {% endblock body %}

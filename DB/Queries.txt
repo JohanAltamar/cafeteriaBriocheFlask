@@ -1,0 +1,12 @@
+CREATE TABLE users (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT
+                      UNIQUE,
+    username  VARCHAR UNIQUE
+                      NOT NULL,
+    email     VARCHAR UNIQUE
+                      NOT NULL,
+    password  VARCHAR UNIQUE
+                      NOT NULL,
+    confirmed BOOLEAN DEFAULT (FALSE),
+    enabled   BOOLEAN DEFAULT (TRUE) 
+);

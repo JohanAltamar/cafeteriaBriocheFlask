@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request,redirect, url_for
 from markupsafe import escape
+import CRUD
 import yagmail
 import utils
 
@@ -49,10 +50,6 @@ def admin():
 def admin_subpaths(subpath):
     if subpath== "users":
         return render_template('admin-panel-users.html')
-    elif subpath == "users/add":
-        return render_template("admin-panel-users-add.html")
-    elif subpath == "users/edit":
-        return render_template("admin-panel-users-edit.html")
     elif subpath == "products":
         return render_template("admin-panel-products.html")
     elif subpath == "products/add":
@@ -72,32 +69,62 @@ def do_the_login():
     print("Haciendo login")
     return redirect(url_for('admin'))
 
-@app.route("/add_new_user", methods=["POST"])
+@app.route("/admin/users/add", methods=["GET","POST"])
 def add_new_user_mail_sender():
     try:
         if request.method == 'POST':
-            usuario=request.form['username'] #sacar los campos del form
+            usuario=request.form['username']
             clave=request.form['password']
             email=request.form['email']
             if utils.isEmailValid(email):
                 if utils.isUsernameValid(usuario):
                         if utils.isPasswordValid(clave):
+                            print('todo ok, se procede a crear')
+                            CRUD.register(usuario,clave,email)
                             yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
                             print("Email sent to: " + email)
                             yag.send(to=email,subject='Cuenta Creada',
                             contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: ' + usuario + '\n -Correo: ' + email + '\n -Contraseña:' + clave)  
-                            return 'revisa tu correo='+email
+                            return render_template("admin-panel-users-add.html",Alert="Usuario creado correctamente. Se le envió mensaje de confirmación de cuenta a su correo.") 
                         else:
-                            return 'Error Clave no cumple con lo exigido'    
+                            return render_template("admin-panel-users-add.html",Alert="Error: Clave no cumple con lo exigido.")   
                 else:
-                    return 'Error usuario no cumple con lo exigido'
+                    return render_template("admin-panel-users-add.html",Alert="Error: usuario no cumple con lo exigido.")
             else:
-                return 'Error Correo no cumple con lo exigido'                      
+                return render_template("admin-panel-users-add.html",Alert="Error: Correo no cumple con lo exigido.")                      
         else:
-            # return render_template('reset-password.html')
-            return 'Error faltan datos para validar'
+            return render_template("admin-panel-users-add.html",Alert="")
     except:
-        return "Ocurrió un error"
+        return render_template("admin-panel-users-add.html",Alert="Ocurrió un error en la creación del usuario. Contacte al administrador de la página.")
+
+@app.route("/admin/users/edit", methods=["GET","POST"])
+def get_modify_users():
+    if request.method == 'GET':
+        users = CRUD.leer_usuarios()
+        if users != None:
+            if iter(users):
+                for user in users:
+                    print(user[1])
+            else:
+                print(users['username'])
+        return render_template("admin-panel-users-edit.html",users=users,user="")
+    else:
+        user = CRUD.buscar_un_usuario(request.form['username'])
+        return render_template("admin-panel-users-edit.html",users="",user=user)
+
+@app.route("/admin/users/edit/<string:userId>", methods=["POST"])
+def modify_user(userId):
+    usuario = request.form['username']
+    email = request.form['email']
+    clave = request.form['password']
+    enabled = request.form.get('enabled')
+    if enabled == None:
+        enabled = False
+    if utils.isEmailValid(email) and utils.isUsernameValid(usuario) and (clave == "" or utils.isPasswordValid(clave)):
+        CRUD.actualizar_usuario(userId,usuario,clave,email,enabled)
+        return redirect("/admin/users/edit")
+    return render_template("admin-panel-users-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
+    
 
 @app.after_request
 def after_request(response):
