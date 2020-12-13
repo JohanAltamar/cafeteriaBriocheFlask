@@ -5,8 +5,21 @@ CREATE TABLE users (
                       NOT NULL,
     email     VARCHAR UNIQUE
                       NOT NULL,
-    password  VARCHAR UNIQUE
-                      NOT NULL,
+    password  VARCHAR NOT NULL,
     confirmed BOOLEAN DEFAULT (FALSE),
-    enabled   BOOLEAN DEFAULT (TRUE) 
+    enabled   BOOLEAN DEFAULT (TRUE),
+    admin     BOOLEAN DEFAULT (FALSE) 
 );
+
+CREATE TABLE products (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT
+                             UNIQUE
+                             NOT NULL,
+    product_name     VARCHAR UNIQUE
+                             NOT NULL,
+    product_price    DOUBLE  NOT NULL,
+    product_filename VARCHAR NOT NULL,
+    enabled          BOOLEAN DEFAULT (TRUE) 
+                             NOT NULL
+);
+
