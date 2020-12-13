@@ -1,8 +1,5 @@
 {% extends 'admin-layout.html' %} {% block body %}
 <main>
-  {% if Alert != "" %}
-  <h2>{{Alert}}</h2>
-  {% endif %}
   <h1 class="title">Agregar Usuario</h1>
   <form action="/admin/users/add" method="POST">
     <div>
@@ -34,5 +31,9 @@
     </div>
     <button type="submit">Crear Usuario</button>
   </form>
+  {% if Alert != "" %}
+  <br />
+  <h2>{{Alert}}</h2>
+  {% endif %}
 </main>
 {% endblock body %}

@@ -1,11 +1,11 @@
-CREATE TABLE usuarios (
+CREATE TABLE users (
     id        INTEGER PRIMARY KEY AUTOINCREMENT
                       UNIQUE,
-    usuario   VARCHAR UNIQUE
+    username  VARCHAR UNIQUE
                       NOT NULL,
-    correo    VARCHAR UNIQUE
+    email     VARCHAR UNIQUE
                       NOT NULL,
-    clave     VARCHAR UNIQUE
+    password  VARCHAR UNIQUE
                       NOT NULL,
     confirmed BOOLEAN DEFAULT (FALSE),
     enabled   BOOLEAN DEFAULT (TRUE) 

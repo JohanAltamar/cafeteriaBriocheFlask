@@ -50,10 +50,6 @@ def admin():
 def admin_subpaths(subpath):
     if subpath== "users":
         return render_template('admin-panel-users.html')
-    elif subpath == "users/add":
-        return render_template("admin-panel-users-add.html",Alert="")
-    elif subpath == "users/edit":
-        return render_template("admin-panel-users-edit.html")
     elif subpath == "products":
         return render_template("admin-panel-products.html")
     elif subpath == "products/add":
@@ -77,7 +73,7 @@ def do_the_login():
 def add_new_user_mail_sender():
     try:
         if request.method == 'POST':
-            usuario=request.form['username'] #sacar los campos del form
+            usuario=request.form['username']
             clave=request.form['password']
             email=request.form['email']
             if utils.isEmailValid(email):
@@ -100,6 +96,35 @@ def add_new_user_mail_sender():
             return render_template("admin-panel-users-add.html",Alert="")
     except:
         return render_template("admin-panel-users-add.html",Alert="Ocurrió un error en la creación del usuario. Contacte al administrador de la página.")
+
+@app.route("/admin/users/edit", methods=["GET","POST"])
+def get_modify_users():
+    if request.method == 'GET':
+        users = CRUD.leer_usuarios()
+        if users != None:
+            if iter(users):
+                for user in users:
+                    print(user[1])
+            else:
+                print(users['username'])
+        return render_template("admin-panel-users-edit.html",users=users,user="")
+    else:
+        user = CRUD.buscar_un_usuario(request.form['username'])
+        return render_template("admin-panel-users-edit.html",users="",user=user)
+
+@app.route("/admin/users/edit/<string:userId>", methods=["POST"])
+def modify_user(userId):
+    usuario = request.form['username']
+    email = request.form['email']
+    clave = request.form['password']
+    enabled = request.form.get('enabled')
+    if enabled == None:
+        enabled = False
+    if utils.isEmailValid(email) and utils.isUsernameValid(usuario) and (clave == "" or utils.isPasswordValid(clave)):
+        CRUD.actualizar_usuario(userId,usuario,clave,email,enabled)
+        return redirect("/admin/users/edit")
+    return render_template("admin-panel-users-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
+    
 
 @app.after_request
 def after_request(response):
