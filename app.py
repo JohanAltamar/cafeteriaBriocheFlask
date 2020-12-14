@@ -11,7 +11,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static\images')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
 print (UPLOAD_FOLDER)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -27,6 +27,26 @@ def index():
         return render_template('index.html')
     else:
         return do_the_login()
+
+def do_the_login():
+    username = request.form["username"]
+    password = request.form["password"]
+    user = CRUD.buscar_un_usuario(username)
+    print("==============")
+    print(user)
+    print("==============")
+    if user == None:
+        return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
+    elif user[1] == username and user[3] == password:
+        if user[6]== 'True' or user[6]== 1:
+            return redirect(url_for('admin'))
+        else:
+            if user[5] == 1 or user[5]== 'True':
+                return redirect(url_for('cashier'))
+            else:
+                return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
+    else:
+        return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
 
 @app.route("/reset", methods=["GET", "POST"])
 def reset_password():
@@ -83,10 +103,6 @@ def cashier():
             return render_template("cashier-panel.html",products=products)
         else:
             return redirect("/cashier")   
-
-def do_the_login():
-    print("Haciendo login")
-    return redirect(url_for('admin'))
 
 @app.route("/admin/users/add", methods=["GET","POST"])
 def add_new_user_mail_sender():

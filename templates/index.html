@@ -24,7 +24,6 @@
     <main>
       <section class="col-5">
         <div class="user-icon">
-          <a href="/cashier">
             <i class="fa fa-user" aria-hidden="true"></i>
             <h2>Ingresar</h2>
           </a>
@@ -32,17 +31,34 @@
         <form action="/" method="POST">
           <div>
             <label for="username">Usuario</label>
-            <input id="username" type="text" placeholder="Nombre de usuario" />
+            <input
+              id="username"
+              name="username"
+              type="text"
+              placeholder="Nombre de usuario"
+              required
+            />
           </div>
           <div>
             <label for="password">Password</label>
-            <input id="password" type="password" placeholder="Contraseña" />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Contraseña"
+              required
+            />
           </div>
           <div>
             <a href="/reset">¿Olvidó su contraseña?</a>
           </div>
           <button type="submit">Ingresar</button>
         </form>
+        {% if Alert != "" %}
+          <div>
+            <h5 style="margin: 0; text-align: center; color: chartreuse;">{{Alert}}</h5>
+          </div>
+        {% endif %}
         <div id="logo-container">
           <img
             id="misiontic-logo"
