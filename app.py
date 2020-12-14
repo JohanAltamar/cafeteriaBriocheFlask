@@ -1,6 +1,7 @@
 from flask import Flask, flash, render_template, request, redirect, url_for
 from markupsafe import escape
 from werkzeug.utils import secure_filename
+from werkzeug.security import hashlib
 import os
 import CRUD
 import yagmail
@@ -31,22 +32,18 @@ def index():
 def do_the_login():
     username = request.form["username"]
     password = request.form["password"]
+    if not (utils.isUsernameValid(username) and utils.isPasswordValid(password)):
+        return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
     user = CRUD.buscar_un_usuario(username)
-    print("==============")
-    print(user)
-    print("==============")
     if user == None:
         return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
     elif user[1] == username and user[3] == password:
         if user[6]== 'True' or user[6]== 1:
             return redirect(url_for('admin'))
-        else:
-            if user[5] == 1 or user[5]== 'True':
-                return redirect(url_for('cashier'))
-            else:
-                return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
-    else:
-        return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
+        if user[5] == 1 or user[5]== 'True':
+            return redirect(url_for('cashier'))
+        return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
+    return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
 
 @app.route("/reset", methods=["GET", "POST"])
 def reset_password():
