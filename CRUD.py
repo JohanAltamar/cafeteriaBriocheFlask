@@ -56,6 +56,15 @@ def buscar_un_producto(product_name):
     print(rv)
     return rv
 
+def buscar_productos(product_name):
+    conexion = db.get_db()
+    cur=conexion.cursor()
+    cur.execute("SELECT * FROM products WHERE product_name LIKE '%" + product_name + "%'")
+    rv = cur.fetchall()
+    db.close_db()
+    print(rv)
+    return rv
+
 def actualizar_producto(id,product_name,product_price,product_filename,enabled):
     conexion = db.get_db()
     cur=conexion.cursor()

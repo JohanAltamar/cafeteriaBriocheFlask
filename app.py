@@ -67,14 +67,22 @@ def admin_subpaths(subpath):
         return render_template('admin-panel-users.html')
     elif subpath == "products":
         return render_template("admin-panel-products.html")
-    elif subpath == "products/search":
-        return render_template("admin-panel-products-search.html")
     elif subpath == "reports":
         return render_template("admin-panel-reports.html")
 
-@app.route("/cashier")
+@app.route("/cashier", methods=["GET", "POST"])
 def cashier():
-    return render_template("cashier-panel.html")
+    if request.method == "GET":
+        products = CRUD.leer_productos()
+        return render_template("cashier-panel.html",products=products)
+    else:
+        product_name = request.form['product_name']
+        products = ''
+        if utils.isTextValid(product_name):
+            products = CRUD.buscar_productos(product_name)
+            return render_template("cashier-panel.html",products=products)
+        else:
+            return redirect("/cashier")   
 
 def do_the_login():
     print("Haciendo login")
@@ -186,12 +194,35 @@ def modify_product(productId):
         enabled = False
     try:
         product_filename=""
+        if 'file' not in request.files:
+            print('No file part')
+        else:
+            file = request.files['file']
+            if file.filename == '':
+                print('No selected file')
+            elif file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                product_filename=filename
         CRUD.actualizar_producto(productId,product_name,product_price,product_filename,enabled)
         return redirect("/admin/products/edit")
     except:
         return render_template("admin-panel-products-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
 
-
+@app.route("/admin/products/search", methods=["GET","POST"])
+def search_products():
+    if request.method == "GET":
+        products = CRUD.leer_productos()
+    else:
+        product_name = request.form['product_name']
+        products = ''
+        if utils.isTextValid(product_name):
+            products = CRUD.buscar_productos(product_name)
+        else:
+            return redirect("/admin/products/search")
+    return render_template("admin-panel-products-search.html",products=products)
+    
+    
 
 @app.after_request
 def after_request(response):

@@ -1,63 +1,27 @@
 {% extends 'cashier-layout.html' %} {% block body %}
 <main>
-  <form action="" class="search-box">
+  <form action="/cashier" class="search-box" method="POST">
     <input
       type="text"
-      id="username"
+      id="product_name"
+      name="product_name"
       placeholder="Ingrese nombre del producto"
     />
     <button><i class="fa fa-search"></i></button>
   </form>
   <section class="main-container">
     <section class="products-gallery">
+      {% for product in products %}
       <div class="product-card">
+        <h2>{{product[1]}}</h2>
         <img
           class="product-card-image"
-          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-          alt="Taza de café"
+          src="{{ url_for('static', filename='images/'+product[3]) }}"
+          alt="{{product[3]}}"
         />
-        <h2 class="product-card-price">$ 5.000</h2>
+        <h2 class="product-card-price">{{"$ {:,.0f}".format(product[2])}}</h2>
       </div>
-      <div class="product-card">
-        <img
-          class="product-card-image"
-          src="{{ url_for('static', filename='images/juice.jpg') }}"
-          alt="Jugo"
-        />
-        <h2 class="product-card-price">$ 5.000</h2>
-      </div>
-      <div class="product-card">
-        <img
-          class="product-card-image"
-          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-          alt="Taza de café"
-        />
-        <h2 class="product-card-price">$ 5.000</h2>
-      </div>
-      <div class="product-card">
-        <img
-          class="product-card-image"
-          src="{{ url_for('static', filename='images/juice.jpg') }}"
-          alt="Jugo"
-        />
-        <h2 class="product-card-price">$ 5.000</h2>
-      </div>
-      <div class="product-card">
-        <img
-          class="product-card-image"
-          src="{{ url_for('static', filename='images/coffee-cup.jpg') }}"
-          alt="Taza de café"
-        />
-        <h2 class="product-card-price">$ 5.000</h2>
-      </div>
-      <div class="product-card">
-        <img
-          class="product-card-image"
-          src="{{ url_for('static', filename='images/juice.jpg') }}"
-          alt="Jugo"
-        />
-        <h2 class="product-card-price">$ 5.000</h2>
-      </div>
+      {% endfor %}
     </section>
     <section class="cart-resume">
       <h3 class="title">Resumen de la Orden</h3>
