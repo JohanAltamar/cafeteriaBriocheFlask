@@ -1,10 +1,25 @@
-from flask import Flask, render_template, request,redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for
 from markupsafe import escape
+from werkzeug.utils import secure_filename
+import os
 import CRUD
 import yagmail
 import utils
 
+UPLOAD_FOLDER = '/images'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
 app = Flask(__name__)
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static\images')
+print (UPLOAD_FOLDER)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -52,18 +67,22 @@ def admin_subpaths(subpath):
         return render_template('admin-panel-users.html')
     elif subpath == "products":
         return render_template("admin-panel-products.html")
-    elif subpath == "products/add":
-        return render_template("admin-panel-products-add.html")
-    elif subpath == "products/edit":
-        return render_template("admin-panel-products-edit.html")
-    elif subpath == "products/search":
-        return render_template("admin-panel-products-search.html")
     elif subpath == "reports":
         return render_template("admin-panel-reports.html")
 
-@app.route("/cashier")
+@app.route("/cashier", methods=["GET", "POST"])
 def cashier():
-    return render_template("cashier-panel.html")
+    if request.method == "GET":
+        products = CRUD.leer_productos()
+        return render_template("cashier-panel.html",products=products)
+    else:
+        product_name = request.form['product_name']
+        products = ''
+        if utils.isTextValid(product_name):
+            products = CRUD.buscar_productos(product_name)
+            return render_template("cashier-panel.html",products=products)
+        else:
+            return redirect("/cashier")   
 
 def do_the_login():
     print("Haciendo login")
@@ -124,6 +143,85 @@ def modify_user(userId):
         CRUD.actualizar_usuario(userId,usuario,clave,email,enabled)
         return redirect("/admin/users/edit")
     return render_template("admin-panel-users-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
+    
+@app.route("/admin/products/add", methods=["GET", "POST"])
+def add_new_product():
+    if request.method == "GET":
+        return render_template("admin-panel-products-add.html")
+    else:
+        print (request.files)
+        if 'file' not in request.files:
+            print('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            print('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            # filename = file.filename
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            product_name = request.form['product_name']
+            product_price = request.form['product_price']
+            CRUD.create_product(product_name,product_price,filename)
+            return render_template("admin-panel-products-add.html",Alert="Producto creado exitosamente.")
+        return render_template("admin-panel-products-add.html")
+
+@app.route("/admin/products/edit", methods=["GET","POST"])
+def get_modify_products():
+    if request.method == 'GET':
+        products = CRUD.leer_productos()
+        print(products)
+        if products != None:
+            if iter(products):
+                for product in products:
+                    print(product[1])
+            else:
+                print(products['product_name'])
+        return render_template("admin-panel-products-edit.html",products=products,product="")
+    else:
+        product = CRUD.buscar_un_producto(request.form['product_name'])
+        return render_template("admin-panel-products-edit.html",products="",product=product)
+
+@app.route("/admin/products/edit/<string:productId>", methods=["POST"])
+def modify_product(productId):
+    product_name = request.form['product_name']
+    product_price = request.form['product_price']
+    enabled = request.form.get('enabled')
+    if enabled == None:
+        enabled = False
+    try:
+        product_filename=""
+        if 'file' not in request.files:
+            print('No file part')
+        else:
+            file = request.files['file']
+            if file.filename == '':
+                print('No selected file')
+            elif file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                product_filename=filename
+        CRUD.actualizar_producto(productId,product_name,product_price,product_filename,enabled)
+        return redirect("/admin/products/edit")
+    except:
+        return render_template("admin-panel-products-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
+
+@app.route("/admin/products/search", methods=["GET","POST"])
+def search_products():
+    if request.method == "GET":
+        products = CRUD.leer_productos()
+    else:
+        product_name = request.form['product_name']
+        products = ''
+        if utils.isTextValid(product_name):
+            products = CRUD.buscar_productos(product_name)
+        else:
+            return redirect("/admin/products/search")
+    return render_template("admin-panel-products-search.html",products=products)
+    
     
 
 @app.after_request

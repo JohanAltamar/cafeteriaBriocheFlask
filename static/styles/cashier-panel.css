@@ -199,6 +199,7 @@ form.search-box::after {
   padding: 0.5rem;
   position: absolute;
   width: 100%;
+  object-fit: contain;
 }
 
 .product-card-price {
@@ -229,7 +230,8 @@ form.search-box::after {
   overflow-y: auto;
 }
 
-.cart-items-container, .cart-total-container{
+.cart-items-container,
+.cart-total-container {
   max-width: 200px;
   margin: auto;
 }
@@ -248,6 +250,6 @@ form.search-box::after {
   text-align: right;
 }
 
-.cart-resume button{
+.cart-resume button {
   margin-top: 1rem;
 }
