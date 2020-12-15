@@ -1,8 +1,8 @@
-from flask import Flask, flash, render_template, request, redirect, url_for, session
+from flask import Flask, flash, render_template, request, redirect, url_for, session, make_response
 import functools
 from markupsafe import escape
 from werkzeug.utils import secure_filename
-from werkzeug.security import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import CRUD
 import yagmail
@@ -63,16 +63,20 @@ def do_the_login():
     password = request.form["password"]
     if not (utils.isUsernameValid(username) and utils.isPasswordValid(password)):
         return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
-    user = CRUD.login_usuario(username, password)
+    user = CRUD.buscar_un_usuario(username)
     if user is None:
         flash("Usuario y/o contraseña incorrectas.")
         return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
-    elif user[5] == 1 or user[5]== 'True':
-        create_session(user)
-        if user[6]== 'True' or user[6]== 1:
-            return redirect(url_for('admin'))
-        return redirect(url_for('cashier'))
-    elif user[5] == 0 or user[5] == "False": 
+    elif user[1] == username and check_password_hash(user[3], password):
+        if user[5] == 1 or user[5]== 'True':
+            create_session(user)
+            resp = None
+            if user[6]== 'True' or user[6]== 1:
+                resp= make_response(redirect(url_for('admin')))
+            else: 
+                resp= make_response(redirect(url_for('cashier')))
+            resp.set_cookie('username', username)
+            return resp
         return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
     return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
 
@@ -119,9 +123,9 @@ def admin():
     return render_template('admin-dashboard.html')
 
 @app.route("/admin/<path:subpath>")
-@login_required
-@check_if_admin
 def admin_subpaths(subpath):
+    check_if_admin(subpath)
+    login_required(subpath)
     if subpath== "users":
         return render_template('admin-panel-users.html')
     elif subpath == "products":
@@ -157,8 +161,10 @@ def add_new_user_mail_sender():
             if utils.isEmailValid(email):
                 if utils.isUsernameValid(usuario):
                         if utils.isPasswordValid(clave):
+                            ##VERIFICAR QUE EL USUARIO NO EXISTA
                             print('todo ok, se procede a crear')
-                            CRUD.register(usuario,clave,email)
+                            hashed_password = generate_password_hash(clave)
+                            CRUD.register(usuario,hashed_password,email)
                             yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
                             print("Email sent to: " + email)
                             yag.send(to=email,subject='Cuenta Creada',
@@ -193,9 +199,9 @@ def get_modify_users():
         return render_template("admin-panel-users-edit.html",users="",user=user)
 
 @app.route("/admin/users/edit/<string:userId>", methods=["POST"])
-@login_required
-@check_if_admin
 def modify_user(userId):
+    login_required(userId)
+    check_if_admin(userId)
     usuario = request.form['username']
     email = request.form['email']
     clave = request.form['password']
@@ -203,7 +209,8 @@ def modify_user(userId):
     if enabled == None:
         enabled = False
     if utils.isEmailValid(email) and utils.isUsernameValid(usuario) and (clave == "" or utils.isPasswordValid(clave)):
-        CRUD.actualizar_usuario(userId,usuario,clave,email,enabled)
+        hashed_password=generate_password_hash(clave)
+        CRUD.actualizar_usuario(userId,usuario,hashed_password,email,enabled)
         return redirect("/admin/users/edit")
     return render_template("admin-panel-users-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
     
@@ -253,9 +260,9 @@ def get_modify_products():
         return render_template("admin-panel-products-edit.html",products="",product=product)
 
 @app.route("/admin/products/edit/<string:productId>", methods=["POST"])
-@login_required
-@check_if_admin
 def modify_product(productId):
+    login_required(productId)
+    check_if_admin(productId)
     product_name = request.form['product_name']
     product_price = request.form['product_price']
     enabled = request.form.get('enabled')
