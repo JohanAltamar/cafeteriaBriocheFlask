@@ -1,4 +1,5 @@
-from flask import Flask, flash, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for, session
+import functools
 from markupsafe import escape
 from werkzeug.utils import secure_filename
 from werkzeug.security import hashlib
@@ -11,6 +12,7 @@ UPLOAD_FOLDER = '/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
+app.secret_key = os.urandom( 24 ) #generamos la clave aleatoria
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
 print (UPLOAD_FOLDER)
@@ -22,28 +24,64 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+#<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if not 'user_id' in session :
+            flash('Acceso denegado!')
+            return redirect( url_for('index'))
+        return view()
+    return wrapped_view
+
+def check_if_admin(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session.get("user_admin") == 0 :
+            return redirect( url_for('cashier'))
+        return view()
+    return wrapped_view
+
+def check_if_cashier(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if session.get("user_admin") == 1 :
+            return redirect( url_for('admin'))
+        return view()
+    return wrapped_view
+
 @app.route("/", methods=['GET', 'POST'])
+@check_if_admin
+@check_if_cashier
 def index():
     if request.method == "GET":
         return render_template('index.html')
-    else:
-        return do_the_login()
+    return do_the_login()
 
 def do_the_login():
     username = request.form["username"]
     password = request.form["password"]
     if not (utils.isUsernameValid(username) and utils.isPasswordValid(password)):
         return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
-    user = CRUD.buscar_un_usuario(username)
-    if user == None:
+    user = CRUD.login_usuario(username, password)
+    if user is None:
+        flash("Usuario y/o contraseña incorrectas.")
         return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
-    elif user[1] == username and user[3] == password:
+    elif user[5] == 1 or user[5]== 'True':
+        create_session(user)
         if user[6]== 'True' or user[6]== 1:
             return redirect(url_for('admin'))
-        if user[5] == 1 or user[5]== 'True':
-            return redirect(url_for('cashier'))
+        return redirect(url_for('cashier'))
+    elif user[5] == 0 or user[5] == "False": 
         return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
     return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
+
+def create_session(user):
+    session.clear()
+    session['user_id'] = user[0] #guarda el id
+    session['user_login'] = user[1] #guarda el usuario
+    session['user_email'] = user[2] #guarda el correo
+    session['user_admin'] = user[6] #guarda si es admin
 
 @app.route("/reset", methods=["GET", "POST"])
 def reset_password():
@@ -75,10 +113,14 @@ def reset_password():
         return "render_template('reset-password.html')"
 
 @app.route("/admin")
+@login_required
+@check_if_admin
 def admin():
     return render_template('admin-dashboard.html')
 
 @app.route("/admin/<path:subpath>")
+@login_required
+@check_if_admin
 def admin_subpaths(subpath):
     if subpath== "users":
         return render_template('admin-panel-users.html')
@@ -88,6 +130,8 @@ def admin_subpaths(subpath):
         return render_template("admin-panel-reports.html")
 
 @app.route("/cashier", methods=["GET", "POST"])
+@login_required 
+@check_if_cashier
 def cashier():
     if request.method == "GET":
         products = CRUD.leer_productos()
@@ -102,6 +146,8 @@ def cashier():
             return redirect("/cashier")   
 
 @app.route("/admin/users/add", methods=["GET","POST"])
+@login_required
+@check_if_admin
 def add_new_user_mail_sender():
     try:
         if request.method == 'POST':
@@ -130,6 +176,8 @@ def add_new_user_mail_sender():
         return render_template("admin-panel-users-add.html",Alert="Ocurrió un error en la creación del usuario. Contacte al administrador de la página.")
 
 @app.route("/admin/users/edit", methods=["GET","POST"])
+@login_required
+@check_if_admin
 def get_modify_users():
     if request.method == 'GET':
         users = CRUD.leer_usuarios()
@@ -145,6 +193,8 @@ def get_modify_users():
         return render_template("admin-panel-users-edit.html",users="",user=user)
 
 @app.route("/admin/users/edit/<string:userId>", methods=["POST"])
+@login_required
+@check_if_admin
 def modify_user(userId):
     usuario = request.form['username']
     email = request.form['email']
@@ -158,6 +208,8 @@ def modify_user(userId):
     return render_template("admin-panel-users-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
     
 @app.route("/admin/products/add", methods=["GET", "POST"])
+@login_required
+@check_if_admin
 def add_new_product():
     if request.method == "GET":
         return render_template("admin-panel-products-add.html")
@@ -183,6 +235,8 @@ def add_new_product():
         return render_template("admin-panel-products-add.html")
 
 @app.route("/admin/products/edit", methods=["GET","POST"])
+@login_required
+@check_if_admin
 def get_modify_products():
     if request.method == 'GET':
         products = CRUD.leer_productos()
@@ -199,6 +253,8 @@ def get_modify_products():
         return render_template("admin-panel-products-edit.html",products="",product=product)
 
 @app.route("/admin/products/edit/<string:productId>", methods=["POST"])
+@login_required
+@check_if_admin
 def modify_product(productId):
     product_name = request.form['product_name']
     product_price = request.form['product_price']
@@ -223,6 +279,8 @@ def modify_product(productId):
         return render_template("admin-panel-products-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
 
 @app.route("/admin/products/search", methods=["GET","POST"])
+@login_required
+@check_if_admin
 def search_products():
     if request.method == "GET":
         products = CRUD.leer_productos()
@@ -235,7 +293,10 @@ def search_products():
             return redirect("/admin/products/search")
     return render_template("admin-panel-products-search.html",products=products)
     
-    
+@app.route("/logout")
+def logout_user():
+    session.clear()
+    return redirect("/")
 
 @app.after_request
 def after_request(response):

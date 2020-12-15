@@ -22,6 +22,14 @@ def buscar_un_usuario(username):
     db.close_db()
     return rv
 
+def login_usuario(username, password):
+    conexion = db.get_db()
+    cur=conexion.cursor()
+    cur.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+    rv = cur.fetchone()
+    db.close_db()
+    return rv
+
 def actualizar_usuario(id,usuario,clave,email,enabled):
     conexion = db.get_db()
     cur=conexion.cursor()
