@@ -160,24 +160,20 @@ def add_new_user_mail_sender():
             email=request.form['email']
             if utils.isEmailValid(email):
                 if utils.isUsernameValid(usuario):
-                        if utils.isPasswordValid(clave):
-                            ##VERIFICAR QUE EL USUARIO NO EXISTA
-                            print('todo ok, se procede a crear')
-                            hashed_password = generate_password_hash(clave)
-                            CRUD.register(usuario,hashed_password,email)
-                            yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
-                            print("Email sent to: " + email)
-                            yag.send(to=email,subject='Cuenta Creada',
-                            contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: ' + usuario + '\n -Correo: ' + email + '\n -Contraseña:' + clave)  
-                            return render_template("admin-panel-users-add.html",Alert="Usuario creado correctamente. Se le envió mensaje de confirmación de cuenta a su correo.") 
-                        else:
-                            return render_template("admin-panel-users-add.html",Alert="Error: Clave no cumple con lo exigido.")   
-                else:
-                    return render_template("admin-panel-users-add.html",Alert="Error: usuario no cumple con lo exigido.")
-            else:
-                return render_template("admin-panel-users-add.html",Alert="Error: Correo no cumple con lo exigido.")                      
-        else:
-            return render_template("admin-panel-users-add.html",Alert="")
+                    if utils.isPasswordValid(clave):
+                        ##VERIFICAR QUE EL USUARIO NO EXISTA
+                        print('todo ok, se procede a crear')
+                        hashed_password = generate_password_hash(clave)
+                        CRUD.register(usuario,hashed_password,email)
+                        yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
+                        print("Email sent to: " + email)
+                        yag.send(to=email,subject='Cuenta Creada',
+                        contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: ' + usuario + '\n -Correo: ' + email + '\n -Contraseña:' + clave)  
+                        return render_template("admin-panel-users-add.html",Alert="Usuario creado correctamente. Se le envió mensaje de confirmación de cuenta a su correo.") 
+                    return render_template("admin-panel-users-add.html",Alert="Error: Clave no cumple con lo exigido.")   
+                return render_template("admin-panel-users-add.html",Alert="Error: usuario no cumple con lo exigido.")
+            return render_template("admin-panel-users-add.html",Alert="Error: Correo no cumple con lo exigido.")                      
+        return render_template("admin-panel-users-add.html",Alert="")
     except:
         return render_template("admin-panel-users-add.html",Alert="Ocurrió un error en la creación del usuario. Contacte al administrador de la página.")
 
@@ -283,7 +279,7 @@ def modify_product(productId):
         CRUD.actualizar_producto(productId,product_name,product_price,product_filename,enabled)
         return redirect("/admin/products/edit")
     except:
-        return render_template("admin-panel-products-error.html",message="Error en la actualización del usuario. Favor verificar campos ingresados.")
+        return render_template("admin-panel-products-error.html",message="Error en la actualización del producto. Favor verificar campos ingresados.")
 
 @app.route("/admin/products/search", methods=["GET","POST"])
 @login_required
