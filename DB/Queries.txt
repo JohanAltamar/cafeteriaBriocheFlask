@@ -23,3 +23,35 @@ CREATE TABLE products (
                              NOT NULL
 );
 
+CREATE TABLE payment_methods (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT
+                                UNIQUE
+                                NOT NULL,
+    payment_method_name VARCHAR UNIQUE
+                                NOT NULL
+);
+
+CREATE TABLE orders (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT
+                              UNIQUE
+                              NOT NULL,
+    user_id           INTEGER REFERENCES users (id) 
+                              NOT NULL,
+    payment_method_id INTEGER REFERENCES payment_methods (id) 
+                              NOT NULL,
+    order_date        DATE    NOT NULL,
+    order_total       INTEGER NOT NULL
+);
+
+CREATE TABLE details (
+    id            INTEGER UNIQUE
+                          PRIMARY KEY AUTOINCREMENT
+                          NOT NULL,
+    product_id    INTEGER REFERENCES products (id) 
+                          NOT NULL,
+    order_id      INTEGER REFERENCES orders (id) 
+                          NOT NULL,
+    product_price INTEGER NOT NULL,
+    product_qty   INTEGER NOT NULL
+);
+
