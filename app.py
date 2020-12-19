@@ -1,4 +1,5 @@
-from flask import Flask, flash, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, flash, render_template, request, redirect, url_for, session, make_response, jsonify, send_from_directory
+import datetime
 import functools
 from markupsafe import escape
 from werkzeug.utils import secure_filename
@@ -76,6 +77,8 @@ def do_the_login():
             else: 
                 resp= make_response(redirect(url_for('cashier')))
             resp.set_cookie('username', username)
+            userID = str(user[0])
+            resp.set_cookie('userID', userID)
             return resp
         return render_template("index.html", Alert="Usuario deshabilitado, contacte al administrador.")
     return render_template("index.html", Alert="Usuario y/o contraseña incorrectas.")
@@ -300,6 +303,61 @@ def search_products():
 def logout_user():
     session.clear()
     return redirect("/")
+
+@app.route("/products")
+def fetchProducts():
+    product_name = request.args["name"]
+    if product_name:
+        res = CRUD.buscar_productos(product_name)
+        return jsonify(res)
+
+@app.route("/get-image")
+def getImage():
+    product_image=request.args["image"]
+    print(product_image)
+    if product_image:
+        return send_from_directory(UPLOAD_FOLDER, filename=product_image)
+
+@app.route("/add-product-to-order/<product_id>", methods=['POST'])
+def addProductToOrder (product_id): 
+    if(request.method == 'POST'):
+        currentOrder = CRUD.buscar_orden(session.get('user_id'))
+        print(currentOrder)
+        # buscar si el usuario tiene alguna orden disponible 
+        if len(currentOrder) == 0:
+            now = datetime.datetime.now()
+            CRUD.create_order(session.get('user_id'), now, 0)
+            currentOrder = CRUD.buscar_orden(session.get('user_id'))
+            print(currentOrder)
+        order_id = currentOrder[0][0]
+
+        #buscar si el producto ya existe en la orden
+        product_in_order = CRUD.buscar_producto_en_orden(product_id, order_id)
+        print(product_in_order)
+
+        #buscar información del producto
+        product_info = CRUD.buscar_un_producto(None, product_id)
+        product_price = product_info[2]
+
+        #agregar productos a tabla detalles o modificarlos
+        if product_in_order is None:
+            CRUD.add_product_to_order(product_id, order_id, 1, product_price)
+        else:
+            CRUD.update_product_in_order(product_id, order_id)
+        now = datetime.datetime.now()
+        CRUD.update_order_total(order_id, product_price, now)
+
+
+        # return jsonify({"order_id": currentOrder[0][0], "user_id": currentOrder[0][1], "payment_method_id": currentOrder[0][2], "order_date": currentOrder[0][3], "order_total":currentOrder[0][4], "order_open": currentOrder[0][5]})
+        products_in_order = CRUD.get_order_complete_info(order_id)
+        return jsonify(products_in_order)
+
+@app.route("/get-order-info")
+def getOrdersInfo():
+    currentOrder = CRUD.buscar_orden(session.get('user_id'))
+    order_id = currentOrder[0][0]
+    products_in_order = CRUD.get_order_complete_info(order_id)
+    return jsonify(products_in_order)
 
 @app.after_request
 def after_request(response):

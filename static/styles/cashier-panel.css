@@ -194,6 +194,14 @@ form.search-box::after {
   border: 2px solid #ff0000;
 }
 
+.product-card-title{
+  font-size: 22px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  z-index: 1;
+}
+
 .product-card-image {
   height: 100%;
   padding: 0.5rem;

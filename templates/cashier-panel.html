@@ -6,12 +6,13 @@
       id="product_name"
       name="product_name"
       placeholder="Ingrese nombre del producto"
+      autofocus
     />
-    <button><i class="fa fa-search"></i></button>
+    <button id="search-product-btn" onclick="searchProduct(event)"><i class="fa fa-search"></i></button>
   </form>
   <section class="main-container">
     <section class="products-gallery">
-      {% for product in products %}
+      <!-- {% for product in products %}
       <div class="product-card">
         <h2>{{product[1]}}</h2>
         <img
@@ -21,12 +22,12 @@
         />
         <h2 class="product-card-price">{{"$ {:,.0f}".format(product[2])}}</h2>
       </div>
-      {% endfor %}
+      {% endfor %} -->
     </section>
     <section class="cart-resume">
       <h3 class="title">Resumen de la Orden</h3>
       <div class="cart-items-container">
-        <div class="cart-item">
+        <!-- <div class="cart-item">
           <div class="cart-item-resume">
             <h4>Taza de Café</h4>
             <h4>$ 8.000</h4>
@@ -35,31 +36,11 @@
             <span>x2</span>
             <span>$ 4.000</span>
           </div>
-        </div>
-        <div class="cart-item">
-          <div class="cart-item-resume">
-            <h4>Jugo de Fresa</h4>
-            <h4>$ 8.000</h4>
-          </div>
-          <div class="cart-item-details">
-            <span>x2</span>
-            <span>$ 4.000</span>
-          </div>
-        </div>
-        <div class="cart-item">
-          <div class="cart-item-resume">
-            <h4>Malteada</h4>
-            <h4>$ 8.000</h4>
-          </div>
-          <div class="cart-item-details">
-            <span>x2</span>
-            <span>$ 4.000</span>
-          </div>
-        </div>
+        </div> -->
       </div>
       <div class="cart-total-container">
         <h3>Total</h3>
-        <h3>$ 8.000</h3>
+        <!-- <h3>$ 8.000</h3> -->
       </div>
       <button>Finalizar Venta</button>
     </section>
