@@ -15,10 +15,18 @@ searchField.addEventListener("keyup", (event) => {
   if (key === "Escape") {
     searchField.value = "";
     removeElements(productsGallery);
+    http
+      .get(`${url}/products?name=`)
+      .then((data) => addProductToDOM(data))
+      .catch((err) => console.error(err));
   }
 
-  if (value.length < 3) {
+  if (value.length < 1) {
     removeElements(productsGallery);
+    http
+      .get(`${url}/products?name=`)
+      .then((data) => addProductToDOM(data))
+      .catch((err) => console.error(err));
   }
 });
 
@@ -28,6 +36,7 @@ const searchProduct = (event) => {
   let { value } = searchField;
 
   if (value.length >= 3) {
+    removeElements(productsGallery);
     http
       .get(`${url}/products?name=${value}`)
       .then((data) => addProductToDOM(data))
@@ -73,10 +82,45 @@ const handleProductCardClick = (event, productID) => {
     .catch((error) => console.error(error));
 };
 
+const handleProductCartAddClick = (productID) => {
+  // console.log(productID);
+  http
+    .post(`${url}/add-product-to-order/${productID}`, {})
+    .then(http.get(`${url}/get-order-info`))
+    .then((data) => {
+      listProducts(data);
+    })
+    .catch((error) => console.error(error));
+};
+
+const handleProductCartSubClick = (productID) => {
+  // console.log(productID);
+  http
+    .post(`${url}/sub-product-from-order/${productID}`, {})
+    .then(http.get(`${url}/get-order-info`))
+    .then((data) => {
+      listProducts(data);
+    })
+    .catch((error) => console.error(error));
+};
+
 window.addEventListener("load", () => {
   http
     .get(`${url}/get-order-info`)
-    .then((data) => listProducts(data))
+    .then((data) => {
+      if (data.length != undefined) {
+        listProducts(data);
+      }
+    })
+    .catch((err) => console.error(err));
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  http
+    .get(`${url}/products?name=`)
+    .then((data) => {
+      addProductToDOM(data);
+    })
     .catch((err) => console.error(err));
 });
 
@@ -105,11 +149,30 @@ const listProducts = (products) => {
 
     const cartItemDetails = document.createElement("div");
     cartItemDetails.classList.add("cart-item-details");
+
+    const cardItemAdd = document.createElement("button");
+    cardItemAdd.classList.add("cart-button");
+    cardItemAdd.innerText = "+";
+    cardItemAdd.addEventListener("click", () => {
+      handleProductCartAddClick(item[1]);
+    });
+    const cardItemSub = document.createElement("button");
+    cardItemSub.classList.add("cart-button");
+    cardItemSub.innerText = "-";
+    cardItemSub.addEventListener("click", () => {
+      handleProductCartSubClick(item[1]);
+    });
+
     const cartItemQty = document.createElement("span");
     cartItemQty.innerText = `x${item[4]} `;
     const cartItemPrice = document.createElement("span");
     cartItemPrice.innerText = `$ ${item[3].toLocaleString("de-DE")}`;
-    cartItemDetails.append(cartItemQty, cartItemPrice);
+    cartItemDetails.append(
+      cardItemSub,
+      cardItemAdd,
+      cartItemQty,
+      cartItemPrice
+    );
 
     cartItem.append(cartItemResume, cartItemDetails);
     // console.log(item[2], item[3], item[4]);

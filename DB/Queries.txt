@@ -38,9 +38,11 @@ CREATE TABLE orders (
     user_id           INTEGER REFERENCES users (id) 
                               NOT NULL,
     payment_method_id INTEGER REFERENCES payment_methods (id) 
-                              NOT NULL,
+                              NOT NULL
+                              DEFAULT (1),
     order_date        DATE    NOT NULL,
-    order_total       INTEGER NOT NULL
+    order_total       INTEGER NOT NULL,
+    order_open        BOOLEAN NOT NULL
 );
 
 CREATE TABLE details (

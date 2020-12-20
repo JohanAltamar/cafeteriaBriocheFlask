@@ -51,6 +51,10 @@ def leer_productos():
 def buscar_un_producto(product_name, product_id):
     conexion = db.get_db()
     cur=conexion.cursor()
+    print("======= buscar un producto =======")
+    print(product_name)
+    print(product_id)
+    print("======= buscar un producto =======")
     if product_name is not None:
         cur.execute("SELECT * FROM products WHERE product_name = ?", [product_name])
     else:
@@ -109,6 +113,14 @@ def buscar_producto_en_orden(product_id, order_id):
     db.close_db()
     return rv
 
+def leer_detalles_orden(order_id):
+    conexion = db.get_db()
+    cur=conexion.cursor()
+    cur.execute("SELECT * FROM details WHERE order_id= ?", [order_id])
+    rv = cur.fetchall()
+    db.close_db()
+    return rv
+
 def update_product_in_order(product_id, order_id):
     conexion = db.get_db()
     cur=conexion.cursor()
@@ -116,10 +128,24 @@ def update_product_in_order(product_id, order_id):
     conexion.commit()
     db.close_db()
 
-def update_order_total(order_id, product_price, order_date):
+def substract_product_qty_in_order(product_id, order_id):
     conexion = db.get_db()
     cur=conexion.cursor()
-    cur.execute("UPDATE orders SET order_total= order_total + ?, order_date= ? WHERE id= ? " , [product_price, order_date, order_id])
+    cur.execute("UPDATE details SET product_qty= product_qty - 1 WHERE order_id= ? AND product_id= ?" , [order_id, product_id])
+    conexion.commit()
+    db.close_db()
+
+def delete_product_from_order(product_id,order_id):
+    conexion = db.get_db()
+    cur=conexion.cursor()
+    cur.execute("DELETE FROM details WHERE order_id= ? AND product_id= ?" , [order_id, product_id])
+    conexion.commit()
+    db.close_db()
+
+def update_order_total(order_id, order_total, order_date):
+    conexion = db.get_db()
+    cur=conexion.cursor()
+    cur.execute("UPDATE orders SET order_total= ?, order_date= ? WHERE id= ? " , [order_total, order_date, order_id])
     conexion.commit()
     db.close_db()
 

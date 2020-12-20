@@ -1,3 +1,4 @@
+import re
 from flask import Flask, flash, render_template, request, redirect, url_for, session, make_response, jsonify, send_from_directory
 import datetime
 import functools
@@ -307,9 +308,12 @@ def logout_user():
 @app.route("/products")
 def fetchProducts():
     product_name = request.args["name"]
+    print(product_name)
     if product_name:
         res = CRUD.buscar_productos(product_name)
         return jsonify(res)
+    res = CRUD.leer_productos()
+    return jsonify(res)
 
 @app.route("/get-image")
 def getImage():
@@ -344,17 +348,45 @@ def addProductToOrder (product_id):
             CRUD.add_product_to_order(product_id, order_id, 1, product_price)
         else:
             CRUD.update_product_in_order(product_id, order_id)
-        now = datetime.datetime.now()
-        CRUD.update_order_total(order_id, product_price, now)
+        
+        
+        update_order_total(order_id)
 
 
         # return jsonify({"order_id": currentOrder[0][0], "user_id": currentOrder[0][1], "payment_method_id": currentOrder[0][2], "order_date": currentOrder[0][3], "order_total":currentOrder[0][4], "order_open": currentOrder[0][5]})
         products_in_order = CRUD.get_order_complete_info(order_id)
         return jsonify(products_in_order)
 
+def update_order_total(order_id):
+    items_in_order = CRUD.leer_detalles_orden(order_id)
+    total = 0
+    for item in items_in_order:
+        total += item[3]*item[4]
+    now = datetime.datetime.now()
+    CRUD.update_order_total(order_id,total,now)
+
+
+
+@app.route("/sub-product-from-order/<product_id>", methods=['POST'])
+def subProductFromOrder (product_id): 
+    if(request.method == 'POST'):
+        currentOrder = CRUD.buscar_orden(session.get('user_id'))
+        order_id = currentOrder[0][0]
+        product_in_order = CRUD.buscar_producto_en_orden(product_id, order_id)
+        print(product_in_order)
+        if (product_in_order[4]>1):
+            CRUD.substract_product_qty_in_order(product_id,order_id)
+        else:
+            CRUD.delete_product_from_order(product_id,order_id)
+        update_order_total(order_id)    
+        products_in_order = CRUD.get_order_complete_info(order_id)
+        return jsonify(products_in_order)
+
 @app.route("/get-order-info")
 def getOrdersInfo():
     currentOrder = CRUD.buscar_orden(session.get('user_id'))
+    if not currentOrder:
+        return {}
     order_id = currentOrder[0][0]
     products_in_order = CRUD.get_order_complete_info(order_id)
     return jsonify(products_in_order)
