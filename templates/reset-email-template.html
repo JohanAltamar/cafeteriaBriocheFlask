@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Recuperación de Correo.</h1>
+    <p>Hola {{username}},</p>
+    <br />
+    <p>
+      Has solicitado el restablecimiento de tu cuenta de correo. Haga click en
+      el siguiente botón para que sea dirigido a la página donde podrá crear una
+      contraseña nueva. Sólo tiene 10 minutos para entrar al enlace.
+    </p>
+    <form action="{{url}}reset/confirmation" method="GET">
+      <input type="hidden" name="recoveryKey" value="{{recoveryKey}}" />
+      <button type="submit">Recuperar Contraseña</button>
+    </form>
+  </body>
+</html>

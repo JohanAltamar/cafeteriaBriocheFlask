@@ -22,6 +22,13 @@ def buscar_un_usuario(username):
     db.close_db()
     return rv
 
+def buscar_un_correo(email):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("SELECT * FROM users WHERE email = ?", [email])
+    rv = cur.fetchone()
+    db.close_db()
+    return rv
 
 def actualizar_usuario(id,usuario,clave,email,enabled):
     connection = db.get_db()
@@ -169,3 +176,32 @@ def get_orders_from_date(order_date):
     rv = cur.fetchall()
     db.close_db()
     return rv
+
+def create_recovery_data(user_id,recovery_key,recovery_date):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("INSERT INTO email_recovery (user_id, recovery_key, recovery_date) VALUES (?,?,?)" , [user_id, recovery_key, recovery_date])
+    connection.commit()
+    db.close_db()
+
+def check_recovery_data(recoveryKey):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("SELECT * FROM email_recovery WHERE recovery_key = ? AND used = 0", [recoveryKey])
+    rv = cur.fetchone()
+    db.close_db()
+    return rv
+
+def update_password_recovery(user_id,password):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("UPDATE users SET password=? WHERE id=?" , [password, user_id])
+    connection.commit()
+    db.close_db()
+
+def set_used_recovery_data(user_id):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("UPDATE email_recovery SET used=1 WHERE user_id=?" , [user_id])
+    connection.commit()
+    db.close_db()    

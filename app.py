@@ -1,14 +1,17 @@
 import re
+from sqlite3.dbapi2 import Date
 from flask import Flask, flash, render_template, request, redirect, url_for, session, make_response, jsonify, send_from_directory
 import datetime
 import functools
 from markupsafe import escape
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash, pbkdf2_hex
 import os
 import CRUD
 import yagmail
 import utils
+import random
+import string
 
 UPLOAD_FOLDER = '/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -91,31 +94,67 @@ def create_session(user):
     session['user_email'] = user[2] #guarda el correo
     session['user_admin'] = user[6] #guarda si es admin
 
+def get_random_key(length):
+    lettersAndNumbers = string.ascii_letters + '0123456789'
+    result_str = ''.join(random.choice(lettersAndNumbers) for i in range(length))
+    return result_str
+
 @app.route("/reset", methods=["GET", "POST"])
 def reset_password():
     try:
         if request.method == 'POST':
-            # usuario=request.form['usuario'] #sacar los campos del form
-            # clave=request.form['clave']
             email=request.form['email']
             if utils.isEmailValid(email):
-                # if utils.isUsernameValid(usuario):
-                        # if utils.isPasswordValid(clave):
+                user = CRUD.buscar_un_correo(email)
+                if user == None:
+                    return render_template('reset-password.html', RESET_OK="false",Message="Correo ingresado no es válido") 
+                recoveryKey = get_random_key(30)
+                now = datetime.datetime.now() 
+                CRUD.create_recovery_data(user[0],recoveryKey,now)
+                
                 yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
                 yag.send(to=email,subject='Recupera tu contraseña',
-                contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: usuario_aqui\n -Correo: ' + email + '\n -Contraseña: tu_password')  
+                contents=render_template('reset-email-template.html',username=user[1],email=user[2].replace("@","%40",1),recoveryKey=recoveryKey,url=request.url_root))
                 return render_template('reset-password.html', RESET_OK="true")
-            #             else:
-            #                 return 'Error Clave no cumple con lo exigido'    
-            #     else:
-            #         return 'Error usuario no cumple con lo exigido'
             else:
-                return 'Error Correo no cumple con lo exigido'                      
+                return render_template('reset-password.html', RESET_OK="false",Message="Correo ingresado no es válido")                      
         else:
             return render_template('reset-password.html', RESET_OK="false")
-            # return 'Error faltan datos para validar'
     except:
         return "render_template('reset-password.html')"
+
+@app.route("/reset/confirmation", methods = ["GET","POST"])
+def reset_confirmation():
+    max_time_to_respond=10
+    if request.method == "GET":
+        recoveryKey = request.args.get('recoveryKey')
+        if utils.isTextValid(recoveryKey):
+            register = CRUD.check_recovery_data(recoveryKey)
+            if register != None :
+                now = datetime.datetime.now()
+                registerTime = datetime.datetime.strptime(register[3],"%Y-%m-%d %H:%M:%S.%f")
+                timeDifference = now - registerTime
+                timeDifferenceMinutes=timeDifference.total_seconds()/60
+                if timeDifferenceMinutes<max_time_to_respond:
+                    return render_template('reset-password-change.html',recoveryKey=recoveryKey)
+        return redirect(url_for('index'))
+    password = request.form['password']
+    recoveryKey = request.form['recoveryKey']
+    register = CRUD.check_recovery_data(recoveryKey)
+    if not utils.isPasswordValid(password):
+        return render_template('reset-password-change.html',recoveryKey=recoveryKey,Message="Contraseña no válida")
+    if register != None:
+        now = datetime.datetime.now()
+        registerTime = datetime.datetime.strptime(register[3],"%Y-%m-%d %H:%M:%S.%f")
+        timeDifference = now - registerTime
+        timeDifferenceMinutes=timeDifference.total_seconds()/60
+        if timeDifferenceMinutes<max_time_to_respond:
+            hashed_password = generate_password_hash(password)
+            CRUD.set_used_recovery_data(register[1])
+            CRUD.update_password_recovery(register[1],hashed_password)
+            return render_template('index.html',Alert="Contraseña cambiada con exito")
+    return redirect(url_for('index'))
+
 
 @app.route("/admin")
 @login_required
