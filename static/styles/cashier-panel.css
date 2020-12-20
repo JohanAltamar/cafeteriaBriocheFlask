@@ -194,7 +194,7 @@ form.search-box::after {
   border: 2px solid #ff0000;
 }
 
-.product-card-title{
+.product-card-title {
   font-size: 22px;
   position: absolute;
   text-align: center;
@@ -258,6 +258,16 @@ form.search-box::after {
   text-align: right;
 }
 
+.cart-button {
+  padding: 0.25rem 0.8rem;
+  margin-right: 0.4rem;
+}
+
 .cart-resume button {
   margin-top: 1rem;
+}
+
+.logout-image {
+  height: 2rem;
+  width: 2rem;
 }

@@ -22,14 +22,16 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
+    {% block css %} {% endblock css %}
     <title>Admin Panel | Cafetería Brioche</title>
   </head>
   <header>
     <h1>Cafetería Brioche <span>- Administrador</span></h1>
     <a href="/logout">
       <img
-        src="{{ url_for('static', filename='images/misiontic_logo.png') }}"
-        alt="Mision TIC logo"
+        src="{{ url_for('static', filename='images/logout.png') }}"
+        alt="Logout"
+        class="logout-image"
       />
     </a>
     <div class="menu-button">
@@ -108,5 +110,9 @@
     </div>
     <div class="drawer-background"></div>
   </div>
+  <script>
+    const server_url = "{{server_url}}";
+  </script>
   <script src="{{url_for('static', filename='scripts/main.js')}}"></script>
+  {% block scripts %} {% endblock scripts %}
 </html>

@@ -6,7 +6,7 @@ con=None #variable global para conxion
 def get_db():
     try:
         con=sqlite3.connect('DB/brioche.db')
-        print('Conexión con DB OK.')
+        # print('Conexión con DB OK.')
         return con
     except :
         print('Error al conectar DB.')
