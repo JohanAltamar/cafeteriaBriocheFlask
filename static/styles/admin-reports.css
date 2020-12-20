@@ -1,0 +1,41 @@
+.date-picker-label {
+  margin: 0.5rem;
+}
+
+.date-picker {
+  margin: 0.5rem;
+}
+
+.date-picker-button {
+  margin: 0.5rem;
+}
+
+.date-picker-container {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  margin: 1rem;
+}
+
+.report-viewer {
+  border: thin dashed rgba(0, 0, 0, 0.3);
+  height: 50vh;
+  margin: auto;
+  width: 600px;
+}
+
+.report-viewer .title {
+  margin: 1rem;
+}
+table {
+  margin: auto;
+}
+
+tr {
+  height: 32px;
+}
+
+tr > td {
+  padding-right: 1rem;
+}

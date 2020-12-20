@@ -266,3 +266,8 @@ form.search-box::after {
 .cart-resume button {
   margin-top: 1rem;
 }
+
+.logout-image {
+  height: 2rem;
+  width: 2rem;
+}

@@ -1,32 +1,18 @@
-{% extends 'admin-layout.html' %} {% block body %}
+{% extends 'admin-layout.html' %} {% block css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='styles/admin-reports.css') }}"
+/>
+{% endblock css %} {% block body %}
 <main>
   <h1 class="title">Reportes</h1>
-  <div class="date-picker">
-    <label for="date">Fecha de Reporte</label>
-    <input type="date" />
+  <div class="date-picker-container">
+    <!-- <label for="date">Fecha de Reporte</label>
+    <input type="date" /> -->
   </div>
-  <div class="report-viewer">
-    <h3 class="title">Reporte de Ventas</h3>
-    <table>
-      <tbody>
-        <tr>
-          <td>Fecha</td>
-          <td>02/12/2020</td>
-        </tr>
-        <tr>
-          <td>Productos Vendidos</td>
-          <td>35</td>
-        </tr>
-        <tr>
-          <td>Ventas Realizadas</td>
-          <td>30</td>
-        </tr>
-        <tr>
-          <td>Ingresos</td>
-          <td>$ 250.000</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="report-viewer-container"></div>
 </main>
-{% endblock body %}
+{% endblock body %} {% block scripts %}
+<script src="{{ url_for('static', filename='scripts/library.js')}}"></script>
+<script src="{{url_for('static', filename='scripts/reports.js') }}"></script>
+{% endblock scripts %}

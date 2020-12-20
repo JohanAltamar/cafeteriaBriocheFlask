@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom( 24 ) #generamos la clave aleatoria
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
-print (UPLOAD_FOLDER)
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -29,27 +29,27 @@ def allowed_file(filename):
 #<<<<<<<<<<<<<<<<<< >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 def login_required(view):
     @functools.wraps(view)
-    def wrapped_view(**kwargs):
+    def wrapped_view(*args, **kwargs):
         if not 'user_id' in session :
             flash('Acceso denegado!')
             return redirect( url_for('index'))
-        return view()
+        return view(*args, **kwargs)
     return wrapped_view
 
 def check_if_admin(view):
     @functools.wraps(view)
-    def wrapped_view(**kwargs):
+    def wrapped_view(*args, **kwargs):
         if session.get("user_admin") == 0 :
             return redirect( url_for('cashier'))
-        return view()
+        return view(*args, **kwargs)
     return wrapped_view
 
 def check_if_cashier(view):
     @functools.wraps(view)
-    def wrapped_view(**kwargs):
+    def wrapped_view(*args, **kwargs):
         if session.get("user_admin") == 1 :
             return redirect( url_for('admin'))
-        return view()
+        return view(*args, **kwargs)
     return wrapped_view
 
 @app.route("/", methods=['GET', 'POST'])
@@ -95,7 +95,6 @@ def create_session(user):
 def reset_password():
     try:
         if request.method == 'POST':
-            print("============= POST REQUEST ============")
             # usuario=request.form['usuario'] #sacar los campos del form
             # clave=request.form['clave']
             email=request.form['email']
@@ -103,7 +102,6 @@ def reset_password():
                 # if utils.isUsernameValid(usuario):
                         # if utils.isPasswordValid(clave):
                 yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
-                print("Email sent to: " + email)
                 yag.send(to=email,subject='Recupera tu contraseña',
                 contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: usuario_aqui\n -Correo: ' + email + '\n -Contraseña: tu_password')  
                 return render_template('reset-password.html', RESET_OK="true")
@@ -114,7 +112,6 @@ def reset_password():
             else:
                 return 'Error Correo no cumple con lo exigido'                      
         else:
-            print("================ GET request ===============")
             return render_template('reset-password.html', RESET_OK="false")
             # return 'Error faltan datos para validar'
     except:
@@ -127,6 +124,8 @@ def admin():
     return render_template('admin-dashboard.html')
 
 @app.route("/admin/<path:subpath>")
+@login_required
+@check_if_admin
 def admin_subpaths(subpath):
     check_if_admin(subpath)
     login_required(subpath)
@@ -134,8 +133,19 @@ def admin_subpaths(subpath):
         return render_template('admin-panel-users.html')
     elif subpath == "products":
         return render_template("admin-panel-products.html")
-    elif subpath == "reports":
-        return render_template("admin-panel-reports.html")
+        
+@app.route("/admin/reports")
+@login_required
+@check_if_admin
+def admin_reports():
+    return render_template("admin-panel-reports.html",server_url=request.url_root)
+
+@app.route("/admin/reports/<string:searchedDate>", methods = ["POST"])
+@login_required
+@check_if_admin
+def admin_reports_search(searchedDate):
+    return jsonify(CRUD.get_orders_from_date(searchedDate))
+
 
 @app.route("/cashier", methods=["GET", "POST"])
 @login_required 
@@ -143,13 +153,13 @@ def admin_subpaths(subpath):
 def cashier():
     if request.method == "GET":
         products = CRUD.leer_productos()
-        return render_template("cashier-panel.html",products=products)
+        return render_template("cashier-panel.html",username=session.get('user_login'),products=products,server_url=request.url_root)
     else:
         product_name = request.form['product_name']
         products = ''
         if utils.isTextValid(product_name):
             products = CRUD.buscar_productos(product_name)
-            return render_template("cashier-panel.html",products=products)
+            return render_template("cashier-panel.html",username=session.get('user_login'),products=products)
         else:
             return redirect("/cashier")   
 
@@ -166,11 +176,9 @@ def add_new_user_mail_sender():
                 if utils.isUsernameValid(usuario):
                     if utils.isPasswordValid(clave):
                         ##VERIFICAR QUE EL USUARIO NO EXISTA
-                        print('todo ok, se procede a crear')
                         hashed_password = generate_password_hash(clave)
                         CRUD.register(usuario,hashed_password,email)
                         yag=yagmail.SMTP(user='ciclo3grupof@gmail.com', password='misiontic2022') 
-                        print("Email sent to: " + email)
                         yag.send(to=email,subject='Cuenta Creada',
                         contents='Sus credenciales de ingreso son las siguientes:\n -Usuario: ' + usuario + '\n -Correo: ' + email + '\n -Contraseña:' + clave)  
                         return render_template("admin-panel-users-add.html",Alert="Usuario creado correctamente. Se le envió mensaje de confirmación de cuenta a su correo.") 
@@ -187,18 +195,14 @@ def add_new_user_mail_sender():
 def get_modify_users():
     if request.method == 'GET':
         users = CRUD.leer_usuarios()
-        if users != None:
-            if iter(users):
-                for user in users:
-                    print(user[1])
-            else:
-                print(users['username'])
         return render_template("admin-panel-users-edit.html",users=users,user="")
     else:
         user = CRUD.buscar_un_usuario(request.form['username'])
         return render_template("admin-panel-users-edit.html",users="",user=user)
 
 @app.route("/admin/users/edit/<string:userId>", methods=["POST"])
+@login_required
+@check_if_admin
 def modify_user(userId):
     login_required(userId)
     check_if_admin(userId)
@@ -221,18 +225,12 @@ def add_new_product():
     if request.method == "GET":
         return render_template("admin-panel-products-add.html")
     else:
-        print (request.files)
         if 'file' not in request.files:
-            print('No file part')
             return redirect(request.url)
         file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
         if file.filename == '':
-            print('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            # filename = file.filename
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             product_name = request.form['product_name']
@@ -247,19 +245,14 @@ def add_new_product():
 def get_modify_products():
     if request.method == 'GET':
         products = CRUD.leer_productos()
-        print(products)
-        if products != None:
-            if iter(products):
-                for product in products:
-                    print(product[1])
-            else:
-                print(products['product_name'])
         return render_template("admin-panel-products-edit.html",products=products,product="")
     else:
-        product = CRUD.buscar_un_producto(request.form['product_name'])
+        product = CRUD.buscar_un_producto(request.form['product_name'],"")
         return render_template("admin-panel-products-edit.html",products="",product=product)
 
 @app.route("/admin/products/edit/<string:productId>", methods=["POST"])
+@login_required
+@check_if_admin
 def modify_product(productId):
     login_required(productId)
     check_if_admin(productId)
@@ -270,13 +263,9 @@ def modify_product(productId):
         enabled = False
     try:
         product_filename=""
-        if 'file' not in request.files:
-            print('No file part')
-        else:
+        if 'file' in request.files:
             file = request.files['file']
-            if file.filename == '':
-                print('No selected file')
-            elif file and allowed_file(file.filename):
+            if file and allowed_file(file.filename) and file.filename != '':
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 product_filename=filename
@@ -306,39 +295,31 @@ def logout_user():
     return redirect("/")
 
 @app.route("/products")
+@login_required
 def fetchProducts():
     product_name = request.args["name"]
-    print(product_name)
     if product_name:
         res = CRUD.buscar_productos(product_name)
         return jsonify(res)
     res = CRUD.leer_productos()
     return jsonify(res)
 
-@app.route("/get-image")
-def getImage():
-    product_image=request.args["image"]
-    print(product_image)
-    if product_image:
-        return send_from_directory(UPLOAD_FOLDER, filename=product_image)
-
 @app.route("/add-product-to-order/<product_id>", methods=['POST'])
+@login_required
+@check_if_cashier
 def addProductToOrder (product_id): 
     if(request.method == 'POST'):
         currentOrder = CRUD.buscar_orden(session.get('user_id'))
-        print(currentOrder)
         # buscar si el usuario tiene alguna orden disponible 
         if len(currentOrder) == 0:
             now = datetime.datetime.now()
             CRUD.create_order(session.get('user_id'), now, 0)
             currentOrder = CRUD.buscar_orden(session.get('user_id'))
-            print(currentOrder)
         order_id = currentOrder[0][0]
 
         #buscar si el producto ya existe en la orden
         product_in_order = CRUD.buscar_producto_en_orden(product_id, order_id)
-        print(product_in_order)
-
+        
         #buscar información del producto
         product_info = CRUD.buscar_un_producto(None, product_id)
         product_price = product_info[2]
@@ -368,12 +349,13 @@ def update_order_total(order_id):
 
 
 @app.route("/sub-product-from-order/<product_id>", methods=['POST'])
+@login_required
+@check_if_cashier
 def subProductFromOrder (product_id): 
     if(request.method == 'POST'):
         currentOrder = CRUD.buscar_orden(session.get('user_id'))
         order_id = currentOrder[0][0]
         product_in_order = CRUD.buscar_producto_en_orden(product_id, order_id)
-        print(product_in_order)
         if (product_in_order[4]>1):
             CRUD.substract_product_qty_in_order(product_id,order_id)
         else:
@@ -383,6 +365,8 @@ def subProductFromOrder (product_id):
         return jsonify(products_in_order)
 
 @app.route("/get-order-info")
+@login_required
+@check_if_cashier
 def getOrdersInfo():
     currentOrder = CRUD.buscar_orden(session.get('user_id'))
     if not currentOrder:
@@ -390,6 +374,18 @@ def getOrdersInfo():
     order_id = currentOrder[0][0]
     products_in_order = CRUD.get_order_complete_info(order_id)
     return jsonify(products_in_order)
+
+@app.route("/order-checkout", methods=["POST"])
+@login_required
+@check_if_cashier
+def orderCheckout():
+    currentOrder = CRUD.buscar_orden(session.get('user_id'))
+    if not currentOrder:
+        return {}
+    order_id = currentOrder[0][0]
+    now = datetime.datetime.now()
+    CRUD.order_checkout(order_id,now)
+    return {}
 
 @app.after_request
 def after_request(response):
