@@ -57,3 +57,14 @@ CREATE TABLE details (
     product_qty   INTEGER NOT NULL
 );
 
+CREATE TABLE email_recovery (
+    id            INTEGER NOT NULL
+                          UNIQUE
+                          PRIMARY KEY AUTOINCREMENT,
+    user_id       INTEGER REFERENCES users (id) 
+                          NOT NULL,
+    recovery_key  VARCHAR NOT NULL,
+    recovery_date DATE    NOT NULL,
+    used          BOOLEAN NOT NULL
+                          DEFAULT (FALSE) 
+);
