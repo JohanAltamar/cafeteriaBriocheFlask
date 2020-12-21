@@ -426,6 +426,19 @@ def orderCheckout():
     CRUD.order_checkout(order_id,now)
     return {}
 
+@app.route("/empty-cart", methods=["POST"])
+@login_required
+@check_if_cashier
+def emptyCart():
+    currentOrder = CRUD.buscar_orden(session.get('user_id'))
+    if not currentOrder:
+        return {}
+    order_id = currentOrder[0][0]
+    CRUD.delete_cart_items(order_id)
+    now=datetime.datetime.now()
+    CRUD.update_order_total(order_id,0,now)
+    return {}
+
 @app.after_request
 def after_request(response):
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"

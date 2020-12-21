@@ -267,6 +267,10 @@ form.search-box::after {
   margin-top: 1rem;
 }
 
+.cart-checkout-button {
+  margin: 0.3rem;
+}
+
 .logout-image {
   height: 2rem;
   width: 2rem;
