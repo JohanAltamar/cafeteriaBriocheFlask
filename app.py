@@ -17,7 +17,8 @@ UPLOAD_FOLDER = '/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
-app.secret_key = os.urandom( 24 ) #generamos la clave aleatoria
+SECRET_KEY = '123'
+app.secret_key = '5fffa2e766c5f3d1a85ad8979864459a4d12b25e727ae7a78d1d8f958952a828L'
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
 
@@ -61,9 +62,6 @@ def check_if_cashier(view):
 def index():
     if request.method == "GET":
         return render_template('index.html')
-    return do_the_login()
-
-def do_the_login():
     username = request.form["username"]
     password = request.form["password"]
     if not (utils.isUsernameValid(username) and utils.isPasswordValid(password)):
