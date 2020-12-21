@@ -34,7 +34,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(*args, **kwargs):
         if not 'user_id' in session :
-            flash('Acceso denegado!')
+            print('Acceso denegado!')
             return redirect( url_for('index'))
         return view(*args, **kwargs)
     return wrapped_view
