@@ -17,8 +17,8 @@ UPLOAD_FOLDER = '/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
-SECRET_KEY = '123'
-app.secret_key = '5fffa2e766c5f3d1a85ad8979864459a4d12b25e727ae7a78d1d8f958952a828L'
+
+app.secret_key = '83hfsemNgeKwoffwSc0cZZ54jzGSqoRdAAhsOZ7tiuAqX2hvM11bonnqOMtu'
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
 
