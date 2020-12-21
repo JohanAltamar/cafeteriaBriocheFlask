@@ -17,7 +17,8 @@ UPLOAD_FOLDER = '/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
-app.secret_key = os.urandom( 24 ) #generamos la clave aleatoria
+SECRET_KEY = '123'
+app.secret_key = '5fffa2e766c5f3d1a85ad8979864459a4d12b25e727ae7a78d1d8f958952a828L'
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(app.instance_path), 'static/images')
 
@@ -34,7 +35,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(*args, **kwargs):
         if not 'user_id' in session :
-            flash('Acceso denegado!')
+            print('Acceso denegado!')
             return redirect( url_for('index'))
         return view(*args, **kwargs)
     return wrapped_view
@@ -61,9 +62,6 @@ def check_if_cashier(view):
 def index():
     if request.method == "GET":
         return render_template('index.html')
-    return do_the_login()
-
-def do_the_login():
     username = request.form["username"]
     password = request.form["password"]
     if not (utils.isUsernameValid(username) and utils.isPasswordValid(password)):
@@ -424,6 +422,19 @@ def orderCheckout():
     order_id = currentOrder[0][0]
     now = datetime.datetime.now()
     CRUD.order_checkout(order_id,now)
+    return {}
+
+@app.route("/empty-cart", methods=["POST"])
+@login_required
+@check_if_cashier
+def emptyCart():
+    currentOrder = CRUD.buscar_orden(session.get('user_id'))
+    if not currentOrder:
+        return {}
+    order_id = currentOrder[0][0]
+    CRUD.delete_cart_items(order_id)
+    now=datetime.datetime.now()
+    CRUD.update_order_total(order_id,0,now)
     return {}
 
 @app.after_request

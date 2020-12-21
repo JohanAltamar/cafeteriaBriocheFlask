@@ -205,3 +205,10 @@ def set_used_recovery_data(user_id):
     cur.execute("UPDATE email_recovery SET used=1 WHERE user_id=?" , [user_id])
     connection.commit()
     db.close_db()    
+
+def delete_cart_items(order_id):
+    connection = db.get_db()
+    cur=connection.cursor()
+    cur.execute("DELETE FROM details WHERE order_id= ?" , [order_id])
+    connection.commit()
+    db.close_db()

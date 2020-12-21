@@ -128,6 +128,17 @@ const handleCartCheckoutClick = () => {
     .catch((error) => console.error(error));
 };
 
+const handleEmptyCartButton = () => {
+  http
+    .post(`${url}/empty-cart`, {})
+    .then((data) => {
+      removeElements(cartItemsContainer);
+      removeElements(cartTotalContainer);
+      removeElements(cartCheckoutContainer);
+    })
+    .catch((error) => console.error(error));
+};
+
 window.addEventListener("load", () => {
   http
     .get(`${url}/get-order-info`)
@@ -214,7 +225,15 @@ const listProducts = (products) => {
     cartCheckoutButton.addEventListener("click", () => {
       handleCartCheckoutClick();
     });
-    cartCheckoutContainer.append(cartCheckoutButton);
+
+    const emptyCartButton = document.createElement("button");
+    emptyCartButton.classList.add("cart-checkout-button");
+    emptyCartButton.innerText = "Vaciar Carrito";
+    emptyCartButton.addEventListener("click", () => {
+      handleEmptyCartButton();
+    });
+
+    cartCheckoutContainer.append(emptyCartButton, cartCheckoutButton);
   }
 };
 
